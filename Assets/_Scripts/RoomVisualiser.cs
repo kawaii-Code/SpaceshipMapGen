@@ -1,33 +1,41 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-class RoomVisualiser : MonoBehaviour
+public class RoomVisualiser : MonoBehaviour // Rename and make it like an entry point
 {
-    public GameObject roomPrefab;
-    public List<Room> rooms;
-    
-    public void Awake()
+    [SerializeField] private GameObject _roomPrefab;
+
+    private List<GameObject> _rooms;
+
+    private void Awake()
     {
-        Visualise(rooms);
+        _rooms = new List<GameObject>();
     }
 
-    public void Visualise(List<Room> rooms)
+    public void Visualise(IEnumerable<Room> rooms)
     {
+        Clear();
+        
         foreach (var room in rooms)
         {
-            var r = Instantiate(roomPrefab);
+            var roomObject = Instantiate(_roomPrefab, transform);
 
-            r.transform.localScale = new Vector3(
-                room.Width, room.Height);
-
-            r.name = room.Name;
-
-            r.transform.position = new Vector3(
-                room.X,
-                room.Y);
+            roomObject.name = room.Name;
+            roomObject.transform.position = new Vector3(room.X, room.Y);
+            roomObject.transform.localScale = new Vector3(room.Width, room.Height);
             
-            var rend = r.GetComponent<SpriteRenderer>();
+            var rend = roomObject.GetComponent<SpriteRenderer>();
             rend.color = new Color(Random.Range(0f, 1f), Random.Range(0, 1f), Random.Range(0, 1f));
+            
+            _rooms.Add(roomObject);
         }
+    }
+
+    public void Clear()
+    {
+        foreach (var room in _rooms) 
+            Destroy(room);
+        _rooms.Clear();
     }
 }

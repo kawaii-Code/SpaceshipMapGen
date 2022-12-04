@@ -1,22 +1,31 @@
 ﻿using System;
 
-[Serializable]
-class Door
+public class Door
 {
-    public Direction Direction;
-    public bool Used;
+    private bool _used;
+    public bool Used
+    {
+        get => _used;
+        set
+        {
+            if (_used)
+                throw new InvalidOperationException();
+            _used = value;
+        }
+    }
+    public float LocalX { get; private set; }
+    public float LocalY { get; private set; }
+    public int Id { get; private set; }
+    public DoorData Data { get; private set; }
     
-    public float X;
-    public float Y;
-
-    public Door Clone()
+    public static Door FromData(DoorData data)
     {
         return new Door
         {
-            Direction = Direction,
-            Used = Used,
-            X = X,
-            Y = Y,
+            LocalX = data.LocalPosition.x,
+            LocalY = data.LocalPosition.y,
+            Id = data.Id,
+            Data = data,
         };
     }
 }

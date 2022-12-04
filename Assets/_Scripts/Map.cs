@@ -3,79 +3,107 @@ using System.Linq;
 using UnityEngine;
 using Random = System.Random;
 
-class Map : MonoBehaviour
+public class Map : MonoBehaviour
 {
-    public int TotalRooms;
-    
-    public List<Room> PreMadeRooms; // 5 rooms 2 - (2 -> 1)
+    [SerializeField] private List<RoomData> _preMadeRooms;
+    [SerializeField] private int _totalRooms;
 
-    private int roomsGenerated;
-    private Random random;
-    private List<Room> Rooms;
-    public RoomVisualiser visualier;
+    private List<Room> _generatedRooms;
+    private int _generatedCount;
+    private Random _random;
 
-    public int RoomsLeft => TotalRooms - roomsGenerated;
-    private float x;
-    private float y;
-    
+    private int RoomsLeft => _totalRooms - _generatedCount;
+    public IEnumerable<Room> GeneratedRooms => _generatedRooms;
+
     private void Awake()
     {
-        random = new Random();
-        var startingRoom = PreMadeRooms[random.Next(PreMadeRooms.Count)].Clone();
+        _random = new Random();
+        _generatedRooms = new List<Room>();
+    }
 
-        roomsGenerated++;
-        Rooms = new List<Room>();
+    public void Generate()
+    {
+        Clear();
 
+        var startingRoomData = _preMadeRooms[_random.Next(_preMadeRooms.Count)];
+        var startingRoom = Room.FromData(startingRoomData);
+
+        _generatedCount = 1;
         Generate(startingRoom);
-        visualier.Visualise(Rooms);
     }
 
     private void Generate(Room room)
     {
-        // Non sense collision
-        // Stupid generation??
-        
-        (room.X, room.Y) = (x, y);
-        Rooms.Add(room);
-        
-        roomsGenerated += room.Doors.Count(d => !d.Used);
-        
-        foreach (var door in room.Doors.Where(d => !d.Used))
+        _generatedRooms.Add(room);
+        _generatedCount += room.DoorCount;
+
+        var freeDoors = room.Doors.Where(d => !d.Used).Select(d => d.Data);
+        foreach (var door in freeDoors)
         {
-            var fittingRooms = new List<(Room rm, Door dr)>();
+            var fittingRooms = new List<(RoomData, DoorData)>();
             
-            foreach (var rm in PreMadeRooms)
+            foreach (var rm in _preMadeRooms)
             foreach (var d in rm.Doors)
-                if (d.Direction == door.Direction.Opposite())
+            {
+                if (d.IsOppositeTo(door))
+                {
                     if (RoomsLeft > 0)
                     {
                         if (rm.Doors.Count > 1 && rm.Doors.Count - 1 <= RoomsLeft)
-                            fittingRooms.Add((rm.Clone(), d));
+                            fittingRooms.Add((rm, d));
                     }
                     else if (rm.Doors.Count - 1 <= RoomsLeft)
-                        fittingRooms.Add((rm.Clone(), d));
-
-            if (fittingRooms.Count == 0)
-            {
-                Debug.Log($"Not found for door {door.Direction}, {door.Used}, at room {room.Name}, roomsLeft: {RoomsLeft}");
-                continue;
+                    {
+                        fittingRooms.Add((rm, d));
+                    }
+                }
             }
 
-            var (r, to) = fittingRooms[random.Next(fittingRooms.Count)];
+            if (fittingRooms.Count == 0)
+                continue;
 
-            x = room.X + door.X - to.X;
-            y = room.Y + door.Y - to.Y;
+            var (roomData, doorData) = fittingRooms[_random.Next(fittingRooms.Count)];
+            var resultRoom = Room.FromData(roomData);
             
-            var resultRoom = r.Clone(to);
-            door.Used = true;
+            var doorTo = resultRoom.Doors.First(d => d.Id == doorData.Id);
+            var doorFrom = room.Doors.First(d => d.Id == door.Id);
+
+            switch (door.Direction)
+            {
+                case Direction.North:
+                    resultRoom.X = room.X + doorFrom.LocalX - doorTo.LocalX;
+                    resultRoom.Y = room.Y + room.Height / 2 + resultRoom.Height / 2;
+                    break;
+                case Direction.East:
+                    resultRoom.X = room.X + room.Width / 2 + resultRoom.Width / 2;
+                    resultRoom.Y = room.Y + doorFrom.LocalY - doorTo.LocalY;
+                    break;
+                case Direction.South:
+                    resultRoom.X = room.X + doorFrom.LocalX - doorTo.LocalX;
+                    resultRoom.Y = room.Y - room.Height / 2 - resultRoom.Height / 2;
+                    break;
+                case Direction.West:
+                    resultRoom.X = room.X - room.Width / 2 - resultRoom.Width / 2;
+                    resultRoom.Y = room.Y + doorFrom.LocalY - doorTo.LocalY;
+                    break;
+            }
+            
+            doorTo.Used = true;
+            doorFrom.Used = true;
             
             Generate(resultRoom);
         }
     }
 
-    private bool HasCollisions(Room room)
+    private void Clear()
     {
-        foreach (var other in Rooms)
+        _generatedRooms.Clear();
+        _generatedCount = 0;
+    }
+    
+    private bool HasCollisions(Room room) // Do not touch, this is to be done tomorrow
+    {
+        foreach (var other in _generatedRooms)
             if (other.Collides(room))
                 return true;
         return false;

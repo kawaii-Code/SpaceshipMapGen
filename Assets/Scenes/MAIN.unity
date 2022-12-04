@@ -139,7 +139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &108730607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -152,26 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf2409a204194ee49c64423c1ec23fb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roomPrefab: {fileID: 384190631972570139, guid: bc9d03f794c85c94e9d1651ac442b78e, type: 3}
-  rooms:
-  - Doors: []
-    X: 0
-    Y: 0
-    Width: 0
-    Height: 0
-    Name: 
-  - Doors: []
-    X: 0
-    Y: 0
-    Width: 0
-    Height: 0
-    Name: 
-  - Doors: []
-    X: 0
-    Y: 0
-    Width: 0
-    Height: 0
-    Name: 
+  _roomPrefab: {fileID: 384190631972570139, guid: bc9d03f794c85c94e9d1651ac442b78e, type: 3}
 --- !u!4 &108730608
 Transform:
   m_ObjectHideFlags: 0
@@ -180,12 +161,62 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 108730606}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.14976013, y: 0.18669248, z: -0.009064589}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &471930612
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 471930614}
+  - component: {fileID: 471930613}
+  m_Layer: 0
+  m_Name: Map
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &471930613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 471930612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e738c5fef1424a86b01607ecd1aca8e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _preMadeRooms:
+  - {fileID: 3900983236899321290, guid: 944b63e0c1bef94499c1b7834e9272c4, type: 3}
+  - {fileID: 3569603975687487064, guid: 27d367e5cfdaa7e478b40514f7042ffb, type: 3}
+  - {fileID: 9002770554939177571, guid: 36f1022e912461e48b2fe60a6a2b3ac8, type: 3}
+  - {fileID: 261801967316725490, guid: be488f15ec7f07249b8bace1df509fa3, type: 3}
+  _totalRooms: 4
+--- !u!4 &471930614
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 471930612}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.3503716, y: 0.5084484, z: -0.09542965}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
@@ -271,7 +302,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1336996830
+--- !u!1 &926466784
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -279,227 +310,41 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1336996832}
-  - component: {fileID: 1336996831}
+  - component: {fileID: 926466786}
+  - component: {fileID: 926466785}
   m_Layer: 0
-  m_Name: Map (1)
+  m_Name: Generator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1336996831
+  m_IsActive: 1
+--- !u!114 &926466785
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1336996830}
+  m_GameObject: {fileID: 926466784}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e738c5fef1424a86b01607ecd1aca8e5, type: 3}
+  m_Script: {fileID: 11500000, guid: a0a715befa5817f46956660201bd67a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TotalRooms: 5
-  PreMadeRooms:
-  - Doors:
-    - Direction: 1
-      Used: 0
-      X: 1.5
-      Y: 0.5
-    - Direction: 3
-      Used: 0
-      X: -1.5
-      Y: 0.5
-    X: 0
-    Y: 0
-    Width: 3
-    Height: 2
-    Name: Kozel
-  - Doors:
-    - Direction: 1
-      Used: 0
-      X: 1.5
-      Y: 0.5
-    X: 0
-    Y: 0
-    Width: 3
-    Height: 1
-    Name: Urod
-  - Doors:
-    - Direction: 3
-      Used: 0
-      X: -0.5
-      Y: 1.5
-    X: 0
-    Y: 0
-    Width: 1
-    Height: 3
-    Name: Loh
-  - Doors:
-    - Direction: 3
-      Used: 0
-      X: -1
-      Y: 0.5
-    - Direction: 1
-      Used: 0
-      X: 1
-      Y: 0.5
-    X: 0
-    Y: 0
-    Width: 2
-    Height: 2
-    Name: Krasava
-  visualier: {fileID: 108730607}
---- !u!4 &1336996832
+  _map: {fileID: 471930613}
+  _visualiser: {fileID: 108730607}
+--- !u!4 &926466786
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1336996830}
+  m_GameObject: {fileID: 926466784}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1529408756
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1529408758}
-  - component: {fileID: 1529408757}
-  m_Layer: 0
-  m_Name: Map
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1529408757
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1529408756}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e738c5fef1424a86b01607ecd1aca8e5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TotalRooms: 10
-  PreMadeRooms:
-  - Doors:
-    - Direction: 1
-      Used: 0
-      X: 1.5
-      Y: 0
-    X: 0
-    Y: 0
-    Width: 3
-    Height: 1
-    Name: Urod
-  - Doors:
-    - Direction: 3
-      Used: 0
-      X: -0.5
-      Y: -1
-    X: 0
-    Y: 0
-    Width: 1
-    Height: 3
-    Name: Loh
-  - Doors:
-    - Direction: 1
-      Used: 0
-      X: 1
-      Y: -0.5
-    - Direction: 3
-      Used: 0
-      X: -1
-      Y: -0.5
-    X: 0
-    Y: 0
-    Width: 2
-    Height: 2
-    Name: Krasava
-  - Doors:
-    - Direction: 1
-      Used: 0
-      X: 1.5
-      Y: 0.5
-    - Direction: 3
-      Used: 0
-      X: -1.5
-      Y: 0.5
-    X: 0
-    Y: 0
-    Width: 3
-    Height: 2
-    Name: Kozel
-  - Doors:
-    - Direction: 0
-      Used: 0
-      X: 0
-      Y: 2
-    X: 0
-    Y: 0
-    Width: 1
-    Height: 4
-    Name: Mudila
-  - Doors:
-    - Direction: 2
-      Used: 0
-      X: -1.5
-      Y: -0.5
-    X: 0
-    Y: 0
-    Width: 4
-    Height: 1
-    Name: Ko
-  - Doors:
-    - Direction: 1
-      Used: 0
-      X: 1.5
-      Y: 0
-    - Direction: 0
-      Used: 0
-      X: 0
-      Y: 1.5
-    - Direction: 2
-      Used: 0
-      X: 0
-      Y: -1.5
-    - Direction: 3
-      Used: 0
-      X: -1.5
-      Y: 0
-    X: 0
-    Y: 0
-    Width: 3
-    Height: 3
-    Name: Gnida
-  visualier: {fileID: 108730607}
---- !u!4 &1529408758
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1529408756}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.3503716, y: 0.5084484, z: -0.09542965}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

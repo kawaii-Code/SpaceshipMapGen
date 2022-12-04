@@ -1,59 +1,31 @@
-using System;
 using System.Collections.Generic;
+using System.Linq;
 
-[Serializable]
-class Room
+public class Room
 {
     public List<Door> Doors;
 
-    public float X;
-    public float Y;
-    public float Width;
-    public float Height;
+    public float X { get; set; }
+    public float Y { get; set; }
+    public RoomData Data { get; private set; }
+    public int DoorCount { get; private set; }
+    public float Width { get; private set; }
+    public float Height { get; private set; }
+    public string Name { get; private set; }
 
-    public string Name;
-    
-    public Room Clone()
+    public static Room FromData(RoomData data)
     {
-        var newDoors = new List<Door>();
-        foreach (var door in Doors)
-            newDoors.Add(door.Clone());
-
-        return new Room()
+        var result = new Room
         {
-            Doors = newDoors,
-            X = X,
-            Y = Y,
-            Width = Width,
-            Height = Height,
-            Name = Name,
+            Name = data.Name,
+            Width = data.Width,
+            Height = data.Height,
+            Data = data,
+            Doors = new List<Door>(data.Doors.Select(d => Door.FromData(d))),
+            DoorCount = data.Doors.Count,
         };
-    }
-    
-    public Room Clone(Door transitioingDoor)
-    {
-        var newDoors = new List<Door>();
-        foreach (var door in Doors)
-            if (door.Direction == transitioingDoor.Direction &&
-                door.X == transitioingDoor.X &&
-                door.Y == transitioingDoor.Y)
-            {
-                var newDoor = door.Clone();
-                newDoor.Used = true;
-                newDoors.Add(newDoor);
-            }
-            else 
-                newDoors.Add(door.Clone());
-
-        return new Room()
-        {
-            Doors = newDoors,
-            X = X,
-            Y = Y,
-            Width = Width,
-            Height = Height,
-            Name = Name,
-        };
+        
+        return result;
     }
 
     public bool Collides(Room room)
