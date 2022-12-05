@@ -63,7 +63,7 @@ public class Map : MonoBehaviour
                 {
                     if (RoomsLeft > 0)
                     {
-                        if (candidateRoom.Doors.Count > 1 && candidateRoom.Doors.Count - 1 <= RoomsLeft) // Rewrite
+                        if (candidateRoom.Doors.Count > 1 && candidateRoom.Doors.Count - 1 <= RoomsLeft) // ♥Rewrite
                             fittingRooms.Add((candidateRoom, candidateDoor));
                         else if (RoomsLeft < 4)
                             fittingRooms.Add((candidateRoom, candidateDoor));
@@ -85,7 +85,7 @@ public class Map : MonoBehaviour
             doors.Add(doorTo);
             var resultRoom = Room.FromData(roomToData, doors);
 
-            switch (doorFrom.Data.Direction) // Rewrite
+            switch (doorFrom.Data.Direction) // ♥Rewrite
             {
                 case Direction.North:
                     resultRoom.X = roomFrom.X + doorFrom.LocalX - doorTo.LocalX;
@@ -118,7 +118,7 @@ public class Map : MonoBehaviour
         _generatedCount = 0;
     }
     
-    private bool HasCollisions(Room room) //♥
+    private bool HasCollisions(Room room) //♥Right
     {
         foreach (var other in _generatedRooms)
             if (other.Collides(room))
