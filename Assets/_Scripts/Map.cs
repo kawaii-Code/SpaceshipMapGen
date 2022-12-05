@@ -61,10 +61,23 @@ public class Map : MonoBehaviour
             {
                 if (candidateDoor.IsOppositeTo(doorFrom.Data))
                 {
+                    var candidateCoordinates = GetNextCoordinates(
+                        roomFrom, doorFrom, candidateRoom, candidateDoor
+                    );
+
+                    var r = Room.FromData(candidateRoom, null);
+                    r.X = candidateCoordinates.x;
+                    r.Y = candidateCoordinates.y;
+                    if (HasCollisions(r))
+                    {
+                        Debug.Log("Oh no! I have collisions!");
+                        continue;
+                    }
+                    
                     if (RoomsLeft > 0)
                     {
                         if (candidateRoom.Doors.Count > 1 && candidateRoom.Doors.Count - 1 <= RoomsLeft) // ♥Rewrite
-                            fittingRooms.Add((candidateRoom, candidateDoor));
+                            fittingRooms.Add((candidateRoom, candidateDoor)); // Cool ‼
                         else if (RoomsLeft < 4)
                             fittingRooms.Add((candidateRoom, candidateDoor));
                     }
@@ -85,25 +98,9 @@ public class Map : MonoBehaviour
             doors.Add(doorTo);
             var resultRoom = Room.FromData(roomToData, doors);
 
-            switch (doorFrom.Data.Direction) // ♥Rewrite
-            {
-                case Direction.North:
-                    resultRoom.X = roomFrom.X + doorFrom.LocalX - doorTo.LocalX;
-                    resultRoom.Y = roomFrom.Y + roomFrom.Height / 2 + resultRoom.Height / 2;
-                    break;
-                case Direction.East:
-                    resultRoom.X = roomFrom.X + roomFrom.Width / 2 + resultRoom.Width / 2;
-                    resultRoom.Y = roomFrom.Y + doorFrom.LocalY - doorTo.LocalY;
-                    break;
-                case Direction.South:
-                    resultRoom.X = roomFrom.X + doorFrom.LocalX - doorTo.LocalX;
-                    resultRoom.Y = roomFrom.Y - roomFrom.Height / 2 - resultRoom.Height / 2;
-                    break;
-                case Direction.West:
-                    resultRoom.X = roomFrom.X - roomFrom.Width / 2 - resultRoom.Width / 2;
-                    resultRoom.Y = roomFrom.Y + doorFrom.LocalY - doorTo.LocalY;
-                    break;
-            }
+            var resultCoordinates = GetNextCoordinates(roomFrom, doorFrom, roomToData, doorToData);
+            resultRoom.X = resultCoordinates.x;
+            resultRoom.Y = resultCoordinates.y;
             
             doorTo.Used = true;
             doorFrom.Used = true;
@@ -112,7 +109,34 @@ public class Map : MonoBehaviour
         }
     }
 
-    private void Clear()
+    private static (float x, float y) GetNextCoordinates(Room roomFrom, Door doorFrom, RoomData roomTo, DoorData doorTo)
+    {
+        (float X, float Y) result = (0, 0);
+        
+        switch (doorFrom.Data.Direction) // ♥Rewrite
+        {
+            case Direction.North:
+                result.X = roomFrom.X + doorFrom.LocalX - doorTo.LocalPosition.x;
+                result.Y = roomFrom.Y + roomFrom.Height / 2 + roomTo.Height / 2;
+                break;
+            case Direction.East:
+                result.X = roomFrom.X + roomFrom.Width / 2 + roomTo.Width / 2;
+                result.Y = roomFrom.Y + doorFrom.LocalY - doorTo.LocalPosition.y;
+                break;
+            case Direction.South:
+                result.X = roomFrom.X + doorFrom.LocalX - doorTo.LocalPosition.x;
+                result.Y = roomFrom.Y - roomFrom.Height / 2 - roomTo.Height / 2;
+                break;
+            case Direction.West:
+                result.X = roomFrom.X - roomFrom.Width / 2 - roomTo.Width / 2;
+                result.Y = roomFrom.Y + doorFrom.LocalY - doorTo.LocalPosition.y;
+                break;
+        }
+
+        return result;
+    }
+
+    private void Clear() // ☺ ☻
     {
         _generatedRooms.Clear();
         _generatedCount = 0;
