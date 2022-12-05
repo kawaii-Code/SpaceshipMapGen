@@ -12,6 +12,7 @@ public class RoomVisualiser : MonoBehaviour
 
     private void Awake()
     {
+		_doors = new List<GameObject>();
         _rooms = new List<GameObject>();
     }
 

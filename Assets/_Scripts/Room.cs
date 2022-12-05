@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 
 public class Room
 {
@@ -29,11 +31,31 @@ public class Room
 
     public bool Collides(Room room)
     {
-        var bottomLeftX = room.X - room.Width / 2;
-        var bottomLeftY = room.Y - room.Height / 2;
+        var otherLeftX = room.X - room.Width / 2;
+        var otherDownY = room.Y - room.Height / 2;
+        var otherRightX = room.X + room.Width / 2;
+        var otherUpY = room.X + room.Height / 2;
         
+        var leftX = room.X - room.Width / 2;
+        var downY = room.Y - room.Height / 2;
+        var rightX = room.X + room.Width / 2;
+        var upY = room.X + room.Height / 2;
         
-        
+        if (leftX < otherRightX && otherLeftX < rightX)
+        {
+            if (downY < otherDownY && otherDownY < upY)
+                return true;
+            if (downY < otherUpY && otherUpY < upY)
+                return true;
+        }
+        else if (leftX < otherLeftX && otherLeftX < rightX)
+        {
+            if (downY < otherDownY && otherDownY < upY)
+                return true;
+            if (downY < otherUpY && otherUpY < upY)
+                return true;
+        }
+
         return false;
     }
 }

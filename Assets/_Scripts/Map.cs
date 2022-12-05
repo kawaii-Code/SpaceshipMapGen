@@ -118,7 +118,7 @@ public class Map : MonoBehaviour
         _generatedCount = 0;
     }
     
-    private bool HasCollisions(Room room) // Do not touch, this is to be done tomorrow
+    private bool HasCollisions(Room room) //♥
     {
         foreach (var other in _generatedRooms)
             if (other.Collides(room))
