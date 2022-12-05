@@ -34,18 +34,23 @@ public class Room
         var otherLeftX = room.X - room.Width / 2;
         var otherDownY = room.Y - room.Height / 2;
         var otherRightX = room.X + room.Width / 2;
-        var otherUpY = room.X + room.Height / 2;
+        var otherUpY = room.Y + room.Height / 2;
         
         var leftX = X - Width / 2;
         var downY = Y - Height / 2;
         var rightX = X + Width / 2;
-        var upY = X + Height / 2;
+        var upY = Y + Height / 2;
+
+        if (leftX == otherLeftX && rightX == otherRightX && upY == otherUpY && downY == otherDownY)
+            return true;
         
-        if (leftX < otherRightX && otherLeftX < rightX)
+        if (leftX < otherRightX && otherRightX < rightX)
         {
             if (downY < otherDownY && otherDownY < upY)
                 return true;
             if (downY < otherUpY && otherUpY < upY)
+                return true;
+            if (downY >= otherDownY && upY <= otherUpY)
                 return true;
         }
         else if (leftX < otherLeftX && otherLeftX < rightX)
@@ -53,6 +58,17 @@ public class Room
             if (downY < otherDownY && otherDownY < upY)
                 return true;
             if (downY < otherUpY && otherUpY < upY)
+                return true;
+            if (downY >= otherDownY && upY <= otherUpY)
+                return true;
+        }
+        else if (leftX > otherLeftX && rightX < otherRightX)
+        {
+            if (downY < otherDownY && otherDownY < upY)
+                return true;
+            if (downY < otherUpY && otherUpY < upY)
+                return true;
+            if (downY >= otherDownY && upY <= otherUpY)
                 return true;
         }
 
