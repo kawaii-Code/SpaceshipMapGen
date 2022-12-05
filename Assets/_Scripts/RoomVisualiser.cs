@@ -2,11 +2,13 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class RoomVisualiser : MonoBehaviour // Rename and make it like an entry point
+public class RoomVisualiser : MonoBehaviour
 {
     [SerializeField] private GameObject _roomPrefab;
+    [SerializeField] private GameObject _doorPrefab;
 
     private List<GameObject> _rooms;
+    private List<GameObject> _doors;
 
     private void Awake()
     {
@@ -20,10 +22,22 @@ public class RoomVisualiser : MonoBehaviour // Rename and make it like an entry 
         foreach (var room in rooms)
         {
             var roomObject = Instantiate(_roomPrefab, transform);
-
+            var roomTransform = roomObject.transform;
+            
             roomObject.name = room.Name;
-            roomObject.transform.position = new Vector3(room.X, room.Y);
-            roomObject.transform.localScale = new Vector3(room.Width, room.Height);
+            roomTransform.position = new Vector3(room.X, room.Y);
+            roomTransform.localScale = new Vector3(room.Width, room.Height);
+            
+            foreach (var door in room.Doors)
+            {
+                var d = Instantiate(_doorPrefab);
+                var position = new Vector2(roomTransform.position.x + door.LocalX, roomTransform.position.y + door.LocalY);
+                d.transform.localPosition = position;
+                d.transform.localScale = Vector2.one * 0.25f;
+                d.GetComponent<SpriteRenderer>().sortingOrder = 5;
+                
+                _doors.Add(d);
+            }
             
             var rend = roomObject.GetComponent<SpriteRenderer>();
             rend.color = new Color(Random.Range(0f, 1f), Random.Range(0, 1f), Random.Range(0, 1f));
@@ -32,10 +46,14 @@ public class RoomVisualiser : MonoBehaviour // Rename and make it like an entry 
         }
     }
 
-    public void Clear()
+    private void Clear()
     {
         foreach (var room in _rooms) 
             Destroy(room);
+        foreach (var door in _doors)
+            Destroy(door);
+        
         _rooms.Clear();
+        _doors.Clear();
     }
 }

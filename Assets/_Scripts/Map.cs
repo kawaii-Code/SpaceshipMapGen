@@ -26,35 +26,51 @@ public class Map : MonoBehaviour
         Clear();
 
         var startingRoomData = _preMadeRooms[_random.Next(_preMadeRooms.Count)];
-        var startingRoom = Room.FromData(startingRoomData);
+        var startingRoom = Room.FromData(startingRoomData, startingRoomData.Doors.Select(Door.FromData).ToList());
 
         _generatedCount = 1;
         Generate(startingRoom);
     }
 
-    private void Generate(Room room)
+    private List<T> Shuffle<T>(List<T> list)
     {
-        _generatedRooms.Add(room);
-        _generatedCount += room.DoorCount;
+        var lastIndex = list.Count;
+        while (lastIndex > 1)
+        {
+            var next = _random.Next(lastIndex);
+            (list[next], list[lastIndex-1]) = (list[lastIndex-1], list[next]);
+            lastIndex--;
+        }
+        
+        return list;
+    }
+    
+    private void Generate(Room roomFrom)
+    {
+        _generatedRooms.Add(roomFrom); 
+        _generatedCount += roomFrom.DoorCount;
 
-        var freeDoors = room.Doors.Where(d => !d.Used).Select(d => d.Data);
-        foreach (var door in freeDoors)
+        var shuffledDoors = Shuffle(roomFrom.Doors);
+        var freeDoors = shuffledDoors.Where(d => !d.Used);
+        foreach (var doorFrom in freeDoors)
         {
             var fittingRooms = new List<(RoomData, DoorData)>();
             
-            foreach (var rm in _preMadeRooms)
-            foreach (var d in rm.Doors)
+            foreach (var candidateRoom in _preMadeRooms)
+            foreach (var candidateDoor in candidateRoom.Doors)
             {
-                if (d.IsOppositeTo(door))
+                if (candidateDoor.IsOppositeTo(doorFrom.Data))
                 {
                     if (RoomsLeft > 0)
                     {
-                        if (rm.Doors.Count > 1 && rm.Doors.Count - 1 <= RoomsLeft)
-                            fittingRooms.Add((rm, d));
+                        if (candidateRoom.Doors.Count > 1 && candidateRoom.Doors.Count - 1 <= RoomsLeft) // Rewrite
+                            fittingRooms.Add((candidateRoom, candidateDoor));
+                        else if (RoomsLeft < 4)
+                            fittingRooms.Add((candidateRoom, candidateDoor));
                     }
-                    else if (rm.Doors.Count - 1 <= RoomsLeft)
+                    else if (candidateRoom.Doors.Count == 1)
                     {
-                        fittingRooms.Add((rm, d));
+                        fittingRooms.Add((candidateRoom, candidateDoor));
                     }
                 }
             }
@@ -62,29 +78,30 @@ public class Map : MonoBehaviour
             if (fittingRooms.Count == 0)
                 continue;
 
-            var (roomData, doorData) = fittingRooms[_random.Next(fittingRooms.Count)];
-            var resultRoom = Room.FromData(roomData);
+            var (roomToData, doorToData) = fittingRooms[_random.Next(fittingRooms.Count)];
+            var doorTo = Door.FromData(doorToData);
             
-            var doorTo = resultRoom.Doors.First(d => d.Id == doorData.Id);
-            var doorFrom = room.Doors.First(d => d.Id == door.Id);
+            var doors = roomToData.Doors.Where(d => d != doorToData).Select(Door.FromData).ToList();
+            doors.Add(doorTo);
+            var resultRoom = Room.FromData(roomToData, doors);
 
-            switch (door.Direction)
+            switch (doorFrom.Data.Direction) // Rewrite
             {
                 case Direction.North:
-                    resultRoom.X = room.X + doorFrom.LocalX - doorTo.LocalX;
-                    resultRoom.Y = room.Y + room.Height / 2 + resultRoom.Height / 2;
+                    resultRoom.X = roomFrom.X + doorFrom.LocalX - doorTo.LocalX;
+                    resultRoom.Y = roomFrom.Y + roomFrom.Height / 2 + resultRoom.Height / 2;
                     break;
                 case Direction.East:
-                    resultRoom.X = room.X + room.Width / 2 + resultRoom.Width / 2;
-                    resultRoom.Y = room.Y + doorFrom.LocalY - doorTo.LocalY;
+                    resultRoom.X = roomFrom.X + roomFrom.Width / 2 + resultRoom.Width / 2;
+                    resultRoom.Y = roomFrom.Y + doorFrom.LocalY - doorTo.LocalY;
                     break;
                 case Direction.South:
-                    resultRoom.X = room.X + doorFrom.LocalX - doorTo.LocalX;
-                    resultRoom.Y = room.Y - room.Height / 2 - resultRoom.Height / 2;
+                    resultRoom.X = roomFrom.X + doorFrom.LocalX - doorTo.LocalX;
+                    resultRoom.Y = roomFrom.Y - roomFrom.Height / 2 - resultRoom.Height / 2;
                     break;
                 case Direction.West:
-                    resultRoom.X = room.X - room.Width / 2 - resultRoom.Width / 2;
-                    resultRoom.Y = room.Y + doorFrom.LocalY - doorTo.LocalY;
+                    resultRoom.X = roomFrom.X - roomFrom.Width / 2 - resultRoom.Width / 2;
+                    resultRoom.Y = roomFrom.Y + doorFrom.LocalY - doorTo.LocalY;
                     break;
             }
             

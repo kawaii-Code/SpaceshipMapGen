@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 
 public class Room
 {
@@ -13,7 +12,7 @@ public class Room
     public float Height { get; private set; }
     public string Name { get; private set; }
 
-    public static Room FromData(RoomData data)
+    public static Room FromData(RoomData data, List<Door> doors)
     {
         var result = new Room
         {
@@ -21,7 +20,7 @@ public class Room
             Width = data.Width,
             Height = data.Height,
             Data = data,
-            Doors = new List<Door>(data.Doors.Select(d => Door.FromData(d))),
+            Doors = doors,
             DoorCount = data.Doors.Count,
         };
         
@@ -30,6 +29,11 @@ public class Room
 
     public bool Collides(Room room)
     {
+        var bottomLeftX = room.X - room.Width / 2;
+        var bottomLeftY = room.Y - room.Height / 2;
+        
+        
+        
         return false;
     }
 }

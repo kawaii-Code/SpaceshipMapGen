@@ -5,16 +5,7 @@ public class DoorData : MonoBehaviour
 {
     [field: SerializeField] public Direction Direction { get; private set; }
     public Vector2 LocalPosition => transform.localPosition;
-
-    public int Id { get; private set; }
-    private static int _id;
-
-    private void Awake()
-    {
-        Id = _id;
-        _id++;
-    }
-
+    
     public bool IsOppositeTo(DoorData other)
     {
         return Direction switch
