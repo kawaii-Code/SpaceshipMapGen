@@ -48,7 +48,7 @@ public class Map : MonoBehaviour
     private void Generate(Room roomFrom)
     {
         _generatedRooms.Add(roomFrom); 
-        _generatedCount += roomFrom.DoorCount;
+        _generatedCount += roomFrom.Doors.Count(d => !d.Used);
 
         var shuffledDoors = Shuffle(roomFrom.Doors);
         var freeDoors = shuffledDoors.Where(d => !d.Used);
