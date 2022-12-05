@@ -31,15 +31,18 @@ public class Room
 
     public bool Collides(Room room)
     {
-        var otherLeftX = room.X - room.Width / 2; // -0.5
-        var otherDownY = room.Y - room.Height / 2; // -2.5
-        var otherRightX = room.X + room.Width / 2; // 0.5
-        var otherUpY = room.Y + room.Height / 2; // -0.5
+        var otherLeftX = room.X - room.Width / 2;
+        var otherDownY = room.Y - room.Height / 2;
+        var otherRightX = room.X + room.Width / 2;
+        var otherUpY = room.Y + room.Height / 2;
         
-        var leftX = X - Width / 2; // -1.5
-        var downY = Y - Height / 2; // -0.5
+        var leftX = X - Width / 2;
+        var downY = Y - Height / 2;
         var rightX = X + Width / 2;
         var upY = Y + Height / 2;
+
+        if (leftX == otherLeftX && rightX == otherRightX && upY == otherUpY && downY == otherDownY)
+            return true;
         
         if (leftX < otherRightX && otherRightX < rightX)
         {
@@ -47,12 +50,25 @@ public class Room
                 return true;
             if (downY < otherUpY && otherUpY < upY)
                 return true;
+            if (downY >= otherDownY && upY <= otherUpY)
+                return true;
         }
         else if (leftX < otherLeftX && otherLeftX < rightX)
         {
             if (downY < otherDownY && otherDownY < upY)
                 return true;
             if (downY < otherUpY && otherUpY < upY)
+                return true;
+            if (downY >= otherDownY && upY <= otherUpY)
+                return true;
+        }
+        else if (leftX > otherLeftX && rightX < otherRightX)
+        {
+            if (downY < otherDownY && otherDownY < upY)
+                return true;
+            if (downY < otherUpY && otherUpY < upY)
+                return true;
+            if (downY >= otherDownY && upY <= otherUpY)
                 return true;
         }
 
