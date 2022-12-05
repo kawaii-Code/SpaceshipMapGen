@@ -36,14 +36,11 @@ public class Room
         var otherRightX = room.X + room.Width / 2;
         var otherUpY = room.Y + room.Height / 2;
         
-        var leftX = X - Width / 2;
-        var downY = Y - Height / 2;
-        var rightX = X + Width / 2;
-        var upY = Y + Height / 2;
+        var leftX = X - Width / 2 + 0.001;
+        var downY = Y - Height / 2 + 0.001;
+        var rightX = X + Width / 2 - 0.001;
+        var upY = Y + Height / 2 - 0.001;
 
-        if (leftX == otherLeftX && rightX == otherRightX && upY == otherUpY && downY == otherDownY)
-            return true;
-        
         if (leftX < otherRightX && otherRightX < rightX)
         {
             if (downY < otherDownY && otherDownY < upY)
