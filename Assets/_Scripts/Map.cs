@@ -15,14 +15,17 @@ public class Map : MonoBehaviour
 
     public void Generate()
     {
-        RefreshData();
+        do
+        {
+            Refresh();
 
-        var startingRoomData = _preMadeRooms.RandomElement();
-        var startingDoors = startingRoomData.Doors.Select(Door.FromData).ToList();
-        var startingRoom = Room.FromDataAndDoors(startingRoomData, startingDoors);
-        _generatedCount = 1;
-        
-        Generate(startingRoom);
+            var startingRoomData = _preMadeRooms.RandomElement();
+            var startingDoors = startingRoomData.Doors.Select(Door.FromData).ToList();
+            var startingRoom = Room.FromDataAndDoors(startingRoomData, startingDoors);
+            _generatedCount = 1;
+
+            Generate(startingRoom);
+        } while (_generatedCount < _totalRooms);
     }
     
     private void Generate(Room roomFrom)
@@ -126,9 +129,8 @@ public class Map : MonoBehaviour
         return false;
     }
 
-    private void RefreshData()
+    private void Refresh()
     {
-        _generatedRooms.Clear();
         _generatedRooms = new List<Room>();
         _generatedCount = 0;
     }

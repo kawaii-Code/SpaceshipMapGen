@@ -258,7 +258,11 @@ MonoBehaviour:
   - {fileID: 5306961122418467439, guid: 3ac1b6222f2cad04687656227a348db1, type: 3}
   - {fileID: 2389140082454475895, guid: d122261276bc2904cb8c0c16ef7b7a3c, type: 3}
   - {fileID: 3434631138862842038, guid: ead3a44ea55bf4f4cb16c8edd51bdad8, type: 3}
-  _totalRooms: 20
+  - {fileID: 1431214494641655677, guid: 5c74de7f9085a484c957d48b06507481, type: 3}
+  - {fileID: 8879524766490406860, guid: 5c4f90ae0b35c014094b62807348d6fd, type: 3}
+  - {fileID: 7827704554460953313, guid: de1a669bb286b09479fbc14e25304c0a, type: 3}
+  - {fileID: 6200941992491410195, guid: 2db39d2da036b0847a519d7dba2909e5, type: 3}
+  _totalRooms: 100
 --- !u!4 &471930614
 Transform:
   m_ObjectHideFlags: 0
@@ -387,7 +391,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0a715befa5817f46956660201bd67a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _map: {fileID: 124636520}
+  _map: {fileID: 471930613}
   _visualiser: {fileID: 108730607}
 --- !u!4 &926466786
 Transform:
