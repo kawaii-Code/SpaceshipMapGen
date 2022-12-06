@@ -24,8 +24,21 @@ public class Room
             Height = data.Height,
             Doors = doors,
         };
-        
+
         return result;
+    }
+    
+    public static Room FromRawData(float width, float height, float x, float y, string name, List<Door> doors)
+    {
+        return new Room
+        {
+            X = x,
+            Y = y,
+            Width = width,
+            Height = height,
+            Name = name,
+            Doors = doors,
+        };
     }
 
     public bool CollidesWith(Room room)

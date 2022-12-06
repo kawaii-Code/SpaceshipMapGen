@@ -35,9 +35,13 @@ public class Map : MonoBehaviour
 
         var shuffledDoors = roomFrom.Doors.Shuffle();
         var freeDoors = shuffledDoors.Where(d => !d.Used);
-        
+
+        CreateBarrierRooms(roomFrom, freeDoors);
+
         foreach (var doorFrom in freeDoors)
         {
+            RemoveBarrierRoom(doorFrom);
+
             var fittingRooms = GetFittingRooms(roomFrom, doorFrom);
             if (fittingRooms.Count == 0)
                 continue;
@@ -60,6 +64,31 @@ public class Map : MonoBehaviour
         }
     }
 
+    private void CreateBarrierRooms(Room roomFrom, IEnumerable<Door> doors)
+    {
+        foreach (var doorFrom in doors)
+        {
+            var barrierDoor = Door.FromRawData(roomFrom.X + doorFrom.LocalX, roomFrom.Y + doorFrom.LocalY);
+            var barrierRoomPosition = NextRoomPosition(roomFrom, doorFrom, roomFrom, barrierDoor);
+            var barrierRoom = Room.FromRawData(
+                roomFrom.Width, roomFrom.Height,
+                roomFrom.X, roomFrom.Y,
+                "Barrier", new List<Door>() { doorFrom });
+
+            barrierRoom.SetPosition(barrierRoomPosition);
+
+            _generatedRooms.Add(barrierRoom);
+        }
+    }
+
+    private void RemoveBarrierRoom(Door doorFrom)
+    {
+        var barrierRoom = _generatedRooms
+            .Where(room => room.Name == "Barrier")
+            .First(room => room.Doors.Contains(doorFrom));
+        _generatedRooms.Remove(barrierRoom);
+    }
+
     private List<(RoomData, DoorData)> GetFittingRooms(Room roomFrom, Door doorFrom)
     {
         var result = new List<(RoomData, DoorData)>();
@@ -69,9 +98,7 @@ public class Map : MonoBehaviour
         {
             if (candidateDoor.IsOppositeTo(doorFrom.Data))
             {
-                var candidateCoordinates = NextRoomPosition(
-                    roomFrom, doorFrom, candidateRoom, candidateDoor
-                );
+                var candidateCoordinates = NextRoomPosition(roomFrom, doorFrom, candidateRoom, candidateDoor);
                 var r = Room.FromDataAndDoors(candidateRoom, null);
                 r.SetPosition(candidateCoordinates);
                 if (HasCollisions(r))
@@ -96,25 +123,34 @@ public class Map : MonoBehaviour
 
     private static Vector2 NextRoomPosition(Room roomFrom, Door doorFrom, RoomData roomTo, DoorData doorTo)
     {
+        return NextRoomPosition(
+            roomFrom, 
+            doorFrom, 
+            Room.FromDataAndDoors(roomTo, null), 
+            Door.FromData(doorTo));
+    }
+    
+    private static Vector2 NextRoomPosition(Room roomFrom, Door doorFrom, Room roomTo, Door doorTo)
+    {
         var result = Vector2.zero;
         
         switch (doorFrom.Data.Direction)
         {
             case Direction.North:
-                result.x = roomFrom.X + doorFrom.LocalX - doorTo.LocalPosition.x;
+                result.x = roomFrom.X + doorFrom.LocalX - doorTo.LocalX;
                 result.y= roomFrom.Y + roomFrom.Height / 2 + roomTo.Height / 2;
                 break;
             case Direction.East:
                 result.x = roomFrom.X + roomFrom.Width / 2 + roomTo.Width / 2;
-                result.y = roomFrom.Y + doorFrom.LocalY - doorTo.LocalPosition.y;
+                result.y = roomFrom.Y + doorFrom.LocalY - doorTo.LocalY;
                 break;
             case Direction.South:
-                result.x = roomFrom.X + doorFrom.LocalX - doorTo.LocalPosition.x;
+                result.x = roomFrom.X + doorFrom.LocalX - doorTo.LocalX;
                 result.y = roomFrom.Y - roomFrom.Height / 2 - roomTo.Height / 2;
                 break;
             case Direction.West:
                 result.x = roomFrom.X - roomFrom.Width / 2 - roomTo.Width / 2;
-                result.y = roomFrom.Y + doorFrom.LocalY - doorTo.LocalPosition.y;
+                result.y = roomFrom.Y + doorFrom.LocalY - doorTo.LocalY;
                 break;
         }
 

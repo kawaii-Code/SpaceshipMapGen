@@ -18,4 +18,13 @@
             Data = data,
         };
     }
+
+    public static Door FromRawData(float localX, float localY)
+    {
+        return new Door
+        {
+            LocalX = localX,
+            LocalY = localY,
+        };
+    }
 }

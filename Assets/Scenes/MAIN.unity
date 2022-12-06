@@ -262,7 +262,7 @@ MonoBehaviour:
   - {fileID: 8879524766490406860, guid: 5c4f90ae0b35c014094b62807348d6fd, type: 3}
   - {fileID: 7827704554460953313, guid: de1a669bb286b09479fbc14e25304c0a, type: 3}
   - {fileID: 6200941992491410195, guid: 2db39d2da036b0847a519d7dba2909e5, type: 3}
-  _totalRooms: 100
+  _totalRooms: 10
 --- !u!4 &471930614
 Transform:
   m_ObjectHideFlags: 0
