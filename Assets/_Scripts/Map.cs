@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Random = System.Random;
 
 public class Map : MonoBehaviour
 {
@@ -10,39 +9,20 @@ public class Map : MonoBehaviour
 
     private List<Room> _generatedRooms;
     private int _generatedCount;
-    private Random _random;
 
     private int RoomsLeft => _totalRooms - _generatedCount;
     public IEnumerable<Room> GeneratedRooms => _generatedRooms;
 
-    private void Awake()
-    {
-        _random = new Random();
-        _generatedRooms = new List<Room>();
-    }
-
     public void Generate()
     {
-        Clear();
+        RefreshData();
 
-        var startingRoomData = _preMadeRooms[_random.Next(_preMadeRooms.Count)];
-        var startingRoom = Room.FromData(startingRoomData, startingRoomData.Doors.Select(Door.FromData).ToList());
-
+        var startingRoomData = _preMadeRooms.RandomElement();
+        var startingDoors = startingRoomData.Doors.Select(Door.FromData).ToList();
+        var startingRoom = Room.FromDataAndDoors(startingRoomData, startingDoors);
         _generatedCount = 1;
-        Generate(startingRoom);
-    }
-
-    private List<T> Shuffle<T>(List<T> list)
-    {
-        var lastIndex = list.Count;
-        while (lastIndex > 1)
-        {
-            var next = _random.Next(lastIndex);
-            (list[next], list[lastIndex-1]) = (list[lastIndex-1], list[next]);
-            lastIndex--;
-        }
         
-        return list;
+        Generate(startingRoom);
     }
     
     private void Generate(Room roomFrom)
@@ -50,103 +30,106 @@ public class Map : MonoBehaviour
         _generatedRooms.Add(roomFrom); 
         _generatedCount += roomFrom.Doors.Count(d => !d.Used);
 
-        var shuffledDoors = Shuffle(roomFrom.Doors);
+        var shuffledDoors = roomFrom.Doors.Shuffle();
         var freeDoors = shuffledDoors.Where(d => !d.Used);
+        
         foreach (var doorFrom in freeDoors)
         {
-            var fittingRooms = new List<(RoomData, DoorData)>();
-            
-            foreach (var candidateRoom in _preMadeRooms)
-            foreach (var candidateDoor in candidateRoom.Doors)
-            {
-                if (candidateDoor.IsOppositeTo(doorFrom.Data))
-                {
-                    var candidateCoordinates = GetNextCoordinates(
-                        roomFrom, doorFrom, candidateRoom, candidateDoor
-                    );
-
-                    var r = Room.FromData(candidateRoom, null);
-                    r.X = candidateCoordinates.x;
-                    r.Y = candidateCoordinates.y;
-                    if (HasCollisions(r))
-                    {
-                        Debug.Log("Oh no! I have collisions!");
-                        continue;
-                    }
-                    
-                    if (RoomsLeft > 0)
-                    {
-                        if (candidateRoom.Doors.Count > 1 && candidateRoom.Doors.Count - 1 <= RoomsLeft) // ♥Rewrite
-                            fittingRooms.Add((candidateRoom, candidateDoor)); // Cool ‼
-                        else if (RoomsLeft < 4)
-                            fittingRooms.Add((candidateRoom, candidateDoor));
-                    }
-                    else if (candidateRoom.Doors.Count == 1)
-                    {
-                        fittingRooms.Add((candidateRoom, candidateDoor));
-                    }
-                }
-            }
-
+            var fittingRooms = GetFittingRooms(roomFrom, doorFrom);
             if (fittingRooms.Count == 0)
                 continue;
 
-            var (roomToData, doorToData) = fittingRooms[_random.Next(fittingRooms.Count)];
-            var doorTo = Door.FromData(doorToData);
+            var (roomToData, doorToData) = fittingRooms.RandomElement();
             
+            var doorTo = Door.FromData(doorToData);
             var doors = roomToData.Doors.Where(d => d != doorToData).Select(Door.FromData).ToList();
             doors.Add(doorTo);
-            var resultRoom = Room.FromData(roomToData, doors);
+            
+            var roomTo = Room.FromDataAndDoors(roomToData, doors);
 
-            var resultCoordinates = GetNextCoordinates(roomFrom, doorFrom, roomToData, doorToData);
-            resultRoom.X = resultCoordinates.x;
-            resultRoom.Y = resultCoordinates.y;
+            var position = NextRoomPosition(roomFrom, doorFrom, roomToData, doorToData);
+            roomTo.SetPosition(position);
             
             doorTo.Used = true;
             doorFrom.Used = true;
             
-            Generate(resultRoom);
+            Generate(roomTo);
         }
     }
 
-    private static (float x, float y) GetNextCoordinates(Room roomFrom, Door doorFrom, RoomData roomTo, DoorData doorTo)
+    private List<(RoomData, DoorData)> GetFittingRooms(Room roomFrom, Door doorFrom)
     {
-        (float X, float Y) result = (0, 0);
+        var result = new List<(RoomData, DoorData)>();
         
-        switch (doorFrom.Data.Direction) // ♥Rewrite
+        foreach (var candidateRoom in _preMadeRooms)
+        foreach (var candidateDoor in candidateRoom.Doors)
+        {
+            if (candidateDoor.IsOppositeTo(doorFrom.Data))
+            {
+                var candidateCoordinates = NextRoomPosition(
+                    roomFrom, doorFrom, candidateRoom, candidateDoor
+                );
+                var r = Room.FromDataAndDoors(candidateRoom, null);
+                r.SetPosition(candidateCoordinates);
+                if (HasCollisions(r))
+                    continue;
+
+                if (RoomsLeft > 0)
+                {
+                    if (candidateRoom.Doors.Count > 1 && candidateRoom.Doors.Count - 1 <= RoomsLeft)
+                        result.Add((candidateRoom, candidateDoor));
+                    else if (RoomsLeft < 4)
+                        result.Add((candidateRoom, candidateDoor));
+                }
+                else if (candidateRoom.Doors.Count == 1)
+                {
+                    result.Add((candidateRoom, candidateDoor));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private static Vector2 NextRoomPosition(Room roomFrom, Door doorFrom, RoomData roomTo, DoorData doorTo)
+    {
+        var result = Vector2.zero;
+        
+        switch (doorFrom.Data.Direction)
         {
             case Direction.North:
-                result.X = roomFrom.X + doorFrom.LocalX - doorTo.LocalPosition.x;
-                result.Y = roomFrom.Y + roomFrom.Height / 2 + roomTo.Height / 2;
+                result.x = roomFrom.X + doorFrom.LocalX - doorTo.LocalPosition.x;
+                result.y= roomFrom.Y + roomFrom.Height / 2 + roomTo.Height / 2;
                 break;
             case Direction.East:
-                result.X = roomFrom.X + roomFrom.Width / 2 + roomTo.Width / 2;
-                result.Y = roomFrom.Y + doorFrom.LocalY - doorTo.LocalPosition.y;
+                result.x = roomFrom.X + roomFrom.Width / 2 + roomTo.Width / 2;
+                result.y = roomFrom.Y + doorFrom.LocalY - doorTo.LocalPosition.y;
                 break;
             case Direction.South:
-                result.X = roomFrom.X + doorFrom.LocalX - doorTo.LocalPosition.x;
-                result.Y = roomFrom.Y - roomFrom.Height / 2 - roomTo.Height / 2;
+                result.x = roomFrom.X + doorFrom.LocalX - doorTo.LocalPosition.x;
+                result.y = roomFrom.Y - roomFrom.Height / 2 - roomTo.Height / 2;
                 break;
             case Direction.West:
-                result.X = roomFrom.X - roomFrom.Width / 2 - roomTo.Width / 2;
-                result.Y = roomFrom.Y + doorFrom.LocalY - doorTo.LocalPosition.y;
+                result.x = roomFrom.X - roomFrom.Width / 2 - roomTo.Width / 2;
+                result.y = roomFrom.Y + doorFrom.LocalY - doorTo.LocalPosition.y;
                 break;
         }
 
         return result;
     }
 
-    private void Clear() // ☺ ☻
-    {
-        _generatedRooms.Clear();
-        _generatedCount = 0;
-    }
-    
-    private bool HasCollisions(Room room) //♥Right
+    private bool HasCollisions(Room room)
     {
         foreach (var other in _generatedRooms)
-            if (other.Collides(room))
+            if (other.CollidesWith(room))
                 return true;
         return false;
+    }
+
+    private void RefreshData()
+    {
+        _generatedRooms.Clear();
+        _generatedRooms = new List<Room>();
+        _generatedCount = 0;
     }
 }

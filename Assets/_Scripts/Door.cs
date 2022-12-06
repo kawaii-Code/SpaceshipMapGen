@@ -1,5 +1,9 @@
 ﻿public class Door
 {
+    private Door()
+    {
+    }
+    
     public bool Used { get; set; }
     public float LocalX { get; private set; }
     public float LocalY { get; private set; }
