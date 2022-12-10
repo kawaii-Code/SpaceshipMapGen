@@ -58,15 +58,8 @@ public class Map : MonoBehaviour
             if (fittingRooms.Count == 0)
                 continue;
 
-            var (roomToData, doorToData) = fittingRooms.RandomElement();
-            
-            var doorTo = Door.FromData(doorToData);
-            var doors = roomToData.Doors.Where(d => d != doorToData).Select(Door.FromData).ToList();
-            doors.Add(doorTo);
-            
-            var roomTo = Room.FromDataAndDoors(roomToData, doors);
-
-            var position = NextRoomPosition(roomFrom, doorFrom, roomToData, doorToData);
+            var (roomTo, doorTo) = fittingRooms.RandomElement();
+            var position = NextRoomPosition(roomFrom, doorFrom, roomTo, doorTo);
             roomTo.SetPosition(position);
             
             doorTo.Used = true;
@@ -103,53 +96,46 @@ public class Map : MonoBehaviour
         _generatedRooms.Remove(barrierRoom);
     }
 
-    private List<(RoomData, DoorData)> GetFittingRooms(Room roomFrom, Door doorFrom)
+    private List<(Room fittingRoom, Door fittingDoor)> GetFittingRooms(Room roomFrom, Door doorFrom)
     {
-        var result = new List<(RoomData, DoorData)>();
+        var result = new List<(Room, Door)>();
         
-        foreach (var candidateRoom in _preMadeRoomsData)
+        foreach (var candidateRoom in _preMadeRooms)
         foreach (var candidateDoor in candidateRoom.Doors)
         {
-            if (!candidateDoor.IsOppositeTo(doorFrom.Data)) 
+            if (!candidateDoor.IsOppositeTo(doorFrom)) 
                 continue;
             
-            var r = Room.FromDataAndDoors(candidateRoom, null);
             var candidateCoordinates = NextRoomPosition(roomFrom, doorFrom, candidateRoom, candidateDoor);
-
-            r.SetPosition(candidateCoordinates);
-            if (HasCollisions(r))
+            candidateRoom.SetPosition(candidateCoordinates);
+            if (HasCollisions(candidateRoom))
                 continue;
 
             if (RoomsLeft > 0)
             {
                 if (candidateRoom.Doors.Count > 1 && candidateRoom.Doors.Count - 1 <= RoomsLeft)
-                    result.Add((candidateRoom, candidateDoor));
+                {
+                    result.Add(CopyRoomWithDoor(candidateRoom, candidateDoor));
+                }
                 else if (RoomsLeft < 4)
-                    result.Add((candidateRoom, candidateDoor));
+                {
+                    result.Add(CopyRoomWithDoor(candidateRoom, candidateDoor));
+                }
             }
             else if (candidateRoom.Doors.Count == 1)
             {
-                result.Add((candidateRoom, candidateDoor));
+                result.Add(CopyRoomWithDoor(candidateRoom, candidateDoor));
             }
         }
 
         return result;
     }
 
-    private static Vector2 NextRoomPosition(Room roomFrom, Door doorFrom, RoomData roomTo, DoorData doorTo)
-    {
-        return NextRoomPosition(
-            roomFrom, 
-            doorFrom, 
-            Room.FromDataAndDoors(roomTo, null), 
-            Door.FromData(doorTo));
-    }
-    
     private static Vector2 NextRoomPosition(Room roomFrom, Door doorFrom, Room roomTo, Door doorTo)
     {
         var result = Vector2.zero;
         
-        switch (doorFrom.Data.Direction)
+        switch (doorFrom.Direction)
         {
             case Direction.North:
                 result.x = roomFrom.X + doorFrom.LocalX - doorTo.LocalX;
@@ -170,6 +156,19 @@ public class Map : MonoBehaviour
         }
 
         return result;
+    }
+
+    private static (Room room, Door candidateDoorCopy) CopyRoomWithDoor(Room candidateRoom, Door candidateDoor)
+    {
+        var doors = candidateRoom.Doors
+            .Where(door => door != candidateDoor)
+            .Select(door => door.Copy())
+            .ToList();
+        var candidateDoorCopy = candidateDoor.Copy();
+        doors.Add(candidateDoorCopy);
+        var room = Room.CopyWithDoors(candidateRoom, doors);
+        
+        return (room, candidateDoorCopy);
     }
 
     private bool HasCollisions(Room room)

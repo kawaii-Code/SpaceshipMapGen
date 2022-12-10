@@ -30,6 +30,17 @@ public class Room
             Name = data.Name,
         };
     }
+
+    public static Room CopyWithDoors(Room room, List<Door> doors)
+    {
+        return new Room
+        {
+            Name = room.Name,
+            Width = room.Width,
+            Height = room.Height,
+            Doors = doors,
+        };
+    }
     
     public static Room FromDataAndDoors(RoomData data, List<Door> doors)
     {
