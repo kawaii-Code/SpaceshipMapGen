@@ -8,6 +8,9 @@
     public float LocalX { get; private set; }
     public float LocalY { get; private set; }
     public DoorData Data { get; private set; }
+    public Direction Direction { get; private set; }
+    public Room RoomFrom { get; set; }
+    public Room RoomTo { get; set; }
     
     public static Door FromData(DoorData data)
     {
@@ -15,6 +18,7 @@
         {
             LocalX = data.LocalPosition.x,
             LocalY = data.LocalPosition.y,
+            Direction = data.Direction,
             Data = data,
         };
     }

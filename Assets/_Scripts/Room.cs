@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Room
@@ -15,6 +16,21 @@ public class Room
     public float Height { get; private set; }
     public string Name { get; private set; }
 
+    public static Room FromData(RoomData data)
+    {
+        var doors = data.Doors.Select(Door.FromData).ToList();
+
+        return new Room
+        {
+            Doors = doors,
+            X = 0,
+            Y = 0,
+            Width = data.Width,
+            Height = data.Height,
+            Name = data.Name,
+        };
+    }
+    
     public static Room FromDataAndDoors(RoomData data, List<Door> doors)
     {
         var result = new Room

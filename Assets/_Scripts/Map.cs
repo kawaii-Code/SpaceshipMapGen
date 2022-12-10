@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Map : MonoBehaviour
 {
-    [SerializeField] private List<RoomData> _preMadeRooms;
+    [FormerlySerializedAs("_preMadeRooms")] [SerializeField] private List<RoomData> _preMadeRoomsData;
     [SerializeField] private int _totalRooms;
 
+    private List<Room> _preMadeRooms;
     private List<Room> _generatedRooms;
     private int _generatedCount;
 
@@ -15,19 +17,29 @@ public class Map : MonoBehaviour
 
     public void Generate()
     {
+        _preMadeRooms = new List<Room>();
+        foreach (var data in _preMadeRoomsData) 
+            _preMadeRooms.Add(Room.FromData(data));
+        
         do
         {
             Refresh();
-
-            var startingRoomData = _preMadeRooms.RandomElement();
-            var startingDoors = startingRoomData.Doors.Select(Door.FromData).ToList();
-            var startingRoom = Room.FromDataAndDoors(startingRoomData, startingDoors);
+            var startingRoom = PickStartingRoom();
             _generatedCount = 1;
-
             Generate(startingRoom);
-        } while (_generatedCount < _totalRooms);
+        } 
+        while (_generatedCount < _totalRooms);
     }
-    
+
+    private Room PickStartingRoom()
+    {
+        var startingRoomData = _preMadeRoomsData.RandomElement();
+        var startingDoors = startingRoomData.Doors.Select(Door.FromData).ToList();
+        var startingRoom = Room.FromDataAndDoors(startingRoomData, startingDoors);
+        
+        return startingRoom;
+    }
+
     private void Generate(Room roomFrom)
     {
         _generatedRooms.Add(roomFrom); 
@@ -59,6 +71,8 @@ public class Map : MonoBehaviour
             
             doorTo.Used = true;
             doorFrom.Used = true;
+            doorFrom.RoomFrom = roomFrom;
+            doorFrom.RoomTo = roomTo;
             
             Generate(roomTo);
         }
@@ -93,28 +107,29 @@ public class Map : MonoBehaviour
     {
         var result = new List<(RoomData, DoorData)>();
         
-        foreach (var candidateRoom in _preMadeRooms)
+        foreach (var candidateRoom in _preMadeRoomsData)
         foreach (var candidateDoor in candidateRoom.Doors)
         {
-            if (candidateDoor.IsOppositeTo(doorFrom.Data))
-            {
-                var candidateCoordinates = NextRoomPosition(roomFrom, doorFrom, candidateRoom, candidateDoor);
-                var r = Room.FromDataAndDoors(candidateRoom, null);
-                r.SetPosition(candidateCoordinates);
-                if (HasCollisions(r))
-                    continue;
+            if (!candidateDoor.IsOppositeTo(doorFrom.Data)) 
+                continue;
+            
+            var r = Room.FromDataAndDoors(candidateRoom, null);
+            var candidateCoordinates = NextRoomPosition(roomFrom, doorFrom, candidateRoom, candidateDoor);
 
-                if (RoomsLeft > 0)
-                {
-                    if (candidateRoom.Doors.Count > 1 && candidateRoom.Doors.Count - 1 <= RoomsLeft)
-                        result.Add((candidateRoom, candidateDoor));
-                    else if (RoomsLeft < 4)
-                        result.Add((candidateRoom, candidateDoor));
-                }
-                else if (candidateRoom.Doors.Count == 1)
-                {
+            r.SetPosition(candidateCoordinates);
+            if (HasCollisions(r))
+                continue;
+
+            if (RoomsLeft > 0)
+            {
+                if (candidateRoom.Doors.Count > 1 && candidateRoom.Doors.Count - 1 <= RoomsLeft)
                     result.Add((candidateRoom, candidateDoor));
-                }
+                else if (RoomsLeft < 4)
+                    result.Add((candidateRoom, candidateDoor));
+            }
+            else if (candidateRoom.Doors.Count == 1)
+            {
+                result.Add((candidateRoom, candidateDoor));
             }
         }
 
@@ -138,7 +153,7 @@ public class Map : MonoBehaviour
         {
             case Direction.North:
                 result.x = roomFrom.X + doorFrom.LocalX - doorTo.LocalX;
-                result.y= roomFrom.Y + roomFrom.Height / 2 + roomTo.Height / 2;
+                result.y = roomFrom.Y + roomFrom.Height / 2 + roomTo.Height / 2;
                 break;
             case Direction.East:
                 result.x = roomFrom.X + roomFrom.Width / 2 + roomTo.Width / 2;

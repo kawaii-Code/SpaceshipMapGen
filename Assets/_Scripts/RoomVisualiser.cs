@@ -35,7 +35,10 @@ public class RoomVisualiser : MonoBehaviour
                 var position = new Vector2(roomTransform.position.x + door.LocalX, roomTransform.position.y + door.LocalY);
                 d.transform.localPosition = position;
                 d.transform.localScale = Vector2.one * 0.25f;
-                d.GetComponent<SpriteRenderer>().sortingOrder = 5;
+                
+                var renderer = d.GetComponent<SpriteRenderer>();
+                renderer.sortingOrder = 5;
+                renderer.color = door.Used ? Color.white : Color.red;
                 
                 _doors.Add(d);
             }
