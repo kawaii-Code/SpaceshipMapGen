@@ -64,6 +64,8 @@ public class Map : MonoBehaviour
             
             doorTo.Used = true;
             doorFrom.Used = true;
+            doorTo.RoomFrom = roomFrom;
+            doorTo.RoomTo = roomTo;
             doorFrom.RoomFrom = roomFrom;
             doorFrom.RoomTo = roomTo;
             

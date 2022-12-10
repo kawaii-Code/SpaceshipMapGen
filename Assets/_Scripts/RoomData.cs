@@ -9,5 +9,5 @@ public class RoomData : MonoBehaviour
     
     [SerializeField] private List<DoorData> _doors;
 
-    public IReadOnlyList<DoorData> Doors => _doors;
+    public IEnumerable<DoorData> Doors => _doors;
 }

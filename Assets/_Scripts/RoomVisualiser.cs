@@ -36,11 +36,14 @@ public class RoomVisualiser : MonoBehaviour
                 d.transform.localPosition = position;
                 d.transform.localScale = Vector2.one * 0.25f;
                 
-                var renderer = d.GetComponent<SpriteRenderer>();
-                renderer.sortingOrder = 5;
-                renderer.color = door.Used ? Color.white : Color.red;
+                var spriteRenderer = d.GetComponent<SpriteRenderer>();
+                spriteRenderer.sortingOrder = 5;
+                spriteRenderer.color = door.Used ? Color.white : Color.red;
                 
                 _doors.Add(d);
+
+                if (door.Used)
+                    Debug.Log($"{door.RoomFrom.Name}->{door.RoomTo.Name}");
             }
             
             var rend = roomObject.GetComponent<SpriteRenderer>();
